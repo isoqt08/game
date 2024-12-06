@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1A2B遊戲</title>
+    <style>
+        body {
+            background-image: url("{{ url_for('static', filename='images/back.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .input-container {
+            margin-top: 20px;
+        }
+        .message {
+            margin-top: 20px;
+            font-size: 1.5rem;
+        }
+        input[type="number"] {
+            font-size: 1.2rem;
+            padding: 10px;
+            width: 100px;
+        }
+        button {
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        /* 返回首頁按鈕固定在畫面底部 */
+        .btn-back {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #f8f9fa;
+            color: #343a40;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        .history {
+            margin-top: 20px;
+            font-size: 1rem;
+        }
+        .history li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>1A2B遊戲</h1>
+    <div class="input-container">
+        <label for="guess">猜一個四位數字：</label>
+        <input type="number" id="guess" maxlength="4" min="1000" max="9999" />
+        <button onclick="submitGuess()">提交猜測</button>
+    </div>
+    <div class="message" id="message">請開始遊戲！</div>
+    <ul class="history" id="history"></ul>
+
+    <script>
+        // 生成隨機的四位數字
+        function generateNumber() {
+            let numbers = [];
+            while (numbers.length < 4) {
+                let digit = Math.floor(Math.random() * 10);
+                if (!numbers.includes(digit)) {
+                    numbers.push(digit);
+                }
+            }
+            return numbers.join('');
+        }
+
+        // 初始化遊戲狀態
+        let secretNumber = generateNumber();
+        let guessCount = 0;
+        let history = [];
+
+        // 提交猜測
+        function submitGuess() {
+            const guessInput = document.getElementById('guess');
+            const guess = guessInput.value;
+
+            // 檢查猜測是否有效
+            if (guess.length !== 4 || isNaN(guess) || new Set(guess).size !== 4) {
+                alert("請輸入一個四位數字，其中每個位數都不重複！");
+                return;
+            }
+
+            guessCount++;
+
+            const result = getResult(guess);
+            history.push(`${guess} -> ${result}`);
+            updateHistory();
+            guessInput.value = "";
+
+            // 如果猜對了，顯示勝利訊息
+            if (result === "4A0B") {
+                document.getElementById('message').textContent = `恭喜你！猜對了！總共猜了 ${guessCount} 次。`;
+            } else {
+                document.getElementById('message').textContent = `猜測結果：${result}。繼續猜！`;
+            }
+        }
+
+        // 計算 1A2B 的結果
+        function getResult(guess) {
+            let A = 0, B = 0;
+            let secretArr = secretNumber.split('');
+            let guessArr = guess.split('');
+
+            // 先找出完全匹配的數字 (A)
+            for (let i = 0; i < 4; i++) {
+                if (guessArr[i] === secretArr[i]) {
+                    A++;
+                    secretArr[i] = null;  // 已經匹配過的數字設為 null，防止重複匹配
+                    guessArr[i] = null;
+                }
+            }
+
+            // 找出部分匹配的數字 (B)
+            for (let i = 0; i < 4; i++) {
+                if (guessArr[i] !== null && secretArr.includes(guessArr[i])) {
+                    B++;
+                    // 移除匹配的數字，避免重複計算
+                    let index = secretArr.indexOf(guessArr[i]);
+                    secretArr[index] = null;
+                }
+            }
+
+            return `${A}A${B}B`;
+        }
+
+        // 更新猜測歷史
+        function updateHistory() {
+            const historyList = document.getElementById('history');
+            historyList.innerHTML = "";
+            history.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                historyList.appendChild(li);
+            });
+        }
+    </script>
+
+    <!-- 返回首頁按鈕 -->
+    <a href="{{ url_for('index') }}" class="btn-back">返回首頁</a>
+</body>
+</html>

@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>遊戲王國</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-image: url('static/images/background.jpg'); /* 設定背景圖片 */
+            background-size: cover; /* 背景圖片覆蓋整個螢幕 */
+            background-position: center; /* 背景圖片居中顯示 */
+            background-attachment: fixed; /* 背景固定不隨頁面滾動 */
+        }
+
+        .game-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 50px;
+        }
+
+        .game-item {
+            width: 30%; /* 每個項目占三分之一寬度 */
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .game-item img {
+            width: 250px; /* 調整圖片大小為較大 */
+            height: 250px; /* 調整圖片大小為較大 */
+            margin-bottom: 15px; /* 增加圖片和按鈕之間的間隔 */
+        }
+
+        .game-item a {
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .game-item {
+                width: 45%; /* 螢幕小於768px時每個項目占45%的寬度 */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .game-item {
+                width: 100%; /* 螢幕小於480px時每個項目占100%的寬度 */
+            }
+        }
+
+        /* 自定義返回首頁按鈕 */
+        .btn-back {
+            margin-top: 20px;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+
+        /* 自定義登出按鈕 */
+        .btn-logout {
+            margin-top: 20px;
+            background-color: #dc3545;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mt-5"><strong>Welcome to 遊戲王國</strong></h1>
+
+        <!-- 登出按鈕 -->
+        <div class="text-center">
+            <a href="{{ url_for('logout') }}" class="btn btn-logout btn-lg">登出</a>
+        </div>
+
+        <!-- 遊戲選項 -->
+        <div class="game-container">
+            <div class="game-item">
+                <img src="{{ url_for('static', filename='images/a.jpg') }}" alt="貪吃蛇">
+                <a href="/game/snake" class="btn btn-success btn-lg">
+                    貪吃蛇遊戲
+                </a>
+            </div>
+            <div class="game-item">
+                <img src="{{ url_for('static', filename='images/b.jpg') }}" alt="OOXX遊戲">
+                <a href="/game/ooxx" class="btn btn-success btn-lg">
+                    OOXX遊戲
+                </a>
+            </div>
+            <div class="game-item">
+                <img src="{{ url_for('static', filename='images/c.jpg') }}" alt="1A2B遊戲">
+                <a href="/game/1a2b" class="btn btn-success btn-lg">
+                    1A2B遊戲
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

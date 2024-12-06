@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>貪吃蛇遊戲</title>
+    <style>
+        body {
+            background-image: url("{{ url_for('static', filename='images/back.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            background-color: #f5f5f5;
+            flex-direction: column;
+        }
+        canvas {
+            border: 1px solid black;
+            background-color: black;
+        }
+        .scoreboard {
+            font-size: 24px;
+            color: black;
+            text-align: center;
+            padding: 20px;
+        }
+        /* 返回首頁按鈕固定在畫面底部 */
+        .btn-back {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #f8f9fa;
+            color: #343a40;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        .btn-back:hover {
+            background-color: #e2e6ea;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+        <div class="scoreboard">
+            <p>分數: <span id="score">0</span></p>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const gridSize = 20;
+        const canvasSize = canvas.width;
+        let score = 0;
+
+        let snake = [
+            {x: 100, y: 100},
+            {x: 80, y: 100},
+            {x: 60, y: 100}
+        ];
+        let food = {x: 200, y: 200};
+        let dx = gridSize;
+        let dy = 0;
+        let gameOver = false;
+
+        // 控制方向
+        document.addEventListener("keydown", changeDirection);
+
+        function changeDirection(event) {
+            if (event.key === "ArrowUp" && dy === 0) {
+                dx = 0;
+                dy = -gridSize;
+            }
+            if (event.key === "ArrowDown" && dy === 0) {
+                dx = 0;
+                dy = gridSize;
+            }
+            if (event.key === "ArrowLeft" && dx === 0) {
+                dx = -gridSize;
+                dy = 0;
+            }
+            if (event.key === "ArrowRight" && dx === 0) {
+                dx = gridSize;
+                dy = 0;
+            }
+        }
+
+        function drawSnake() {
+            for (let i = 0; i < snake.length; i++) {
+                ctx.fillStyle = i === 0 ? "green" : "lightgreen";
+                ctx.fillRect(snake[i].x, snake[i].y, gridSize, gridSize);
+            }
+        }
+
+        function drawFood() {
+            ctx.fillStyle = "red";
+            ctx.fillRect(food.x, food.y, gridSize, gridSize);
+        }
+
+        function updateSnakePosition() {
+            const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+            snake.unshift(head);
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                document.getElementById("score").textContent = score;
+                placeFood();
+            } else {
+                snake.pop();
+            }
+        }
+
+        function checkCollision() {
+            const head = snake[0];
+
+            // 檢查牆壁碰撞，若碰撞則結束遊戲
+            if (head.x < 0 || head.x >= canvasSize || head.y < 0 || head.y >= canvasSize) {
+                endGame();
+            }
+
+            // 檢查自我碰撞
+            for (let i = 1; i < snake.length; i++) {
+                if (head.x === snake[i].x && head.y === snake[i].y) {
+                    endGame();
+                }
+            }
+        }
+
+        function placeFood() {
+            food.x = Math.floor(Math.random() * (canvasSize / gridSize)) * gridSize;
+            food.y = Math.floor(Math.random() * (canvasSize / gridSize)) * gridSize;
+        }
+
+        function endGame() {
+            gameOver = true;
+            alert("遊戲結束，分數為 " + score);
+            window.location.reload();
+        }
+
+        function gameLoop() {
+            if (gameOver) return;
+            ctx.clearRect(0, 0, canvasSize, canvasSize);
+            updateSnakePosition();
+            checkCollision();
+            drawSnake();
+            drawFood();
+            setTimeout(gameLoop, 100);
+        }
+
+        placeFood();
+        gameLoop();
+    </script>
+
+    <!-- 返回首頁按鈕 -->
+    <a href="{{ url_for('index') }}" class="btn-back">返回首頁</a>
+</body>
+</html>
